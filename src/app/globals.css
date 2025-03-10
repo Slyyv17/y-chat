@@ -1,0 +1,30 @@
+@import url('https://fonts.cdnfonts.com/css/satoshi');
+@import url('https://fonts.cdnfonts.com/css/mona-sans');
+@import "tailwindcss";
+
+@theme {
+    --color-bg: #171717;
+    --color-primary: #FFFFFF;
+    --color-secondary: #FDC226;
+    --color-accent: #CCCCCC;
+
+    --gradient-one: #43116A;
+    --gradient-two: #0A1832;
+
+    --font-family-display: "Satoshi", "sans-serif";
+    --font-family-body: 'Mona-Sans', sans-serif;
+}
+
+/* Custom classes for fonts */
+.font-display {
+    font-family: var(--font-family-display);
+}
+
+.font-body {
+    font-family: var(--font-family-body);
+}
+
+/* Add this to your CSS */
+.custom-gradient {
+    background: linear-gradient(to top right, var(--color-bg), var(--gradient-two), var(--gradient-one));
+}
