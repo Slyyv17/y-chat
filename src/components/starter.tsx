@@ -1,4 +1,5 @@
 import SocialIcons from "@/app/ui/social-icons";
+import Link from "next/link";
 export default function StartUp() {
     return (
         <section className="flex items-center justify-center w-full h-screen p-6">
@@ -35,12 +36,12 @@ export default function StartUp() {
 
                 {/* Email Signup Button */}
                 <button className="bg-white text-black px-6 py-2 rounded-full w-64 shadow-md font-display cursor-pointer">
-                    Sign up with email
+                    <Link href="/register">Sign up with email</Link>
                 </button>
 
                 {/* Login Link */}
-                <p className="text-sm text-gray-500 font-display">
-                    Existing account? <span className="text-white cursor-pointer">Login</span>
+                <p className="text-sm text-gray-500 font-display flex justify-between items-start w-fit gap-2">
+                    <span className="text-gray-500 cursor-pointer">Existing account?</span> <Link href="/login" className="text-white cursor-pointer hover:underline transition-all duration-300">Login</Link>
                 </p>
 
             </article>
