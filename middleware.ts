@@ -2,16 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "@/lib/auth";
 
 export function middleware(req: NextRequest) {
-  const token = verifyToken(req);
+  const result = verifyToken(req);
 
-  if (token instanceof NextResponse) {
-    return token; // Unauthorized or invalid token response
+  if (result instanceof NextResponse) {
+    return result;
   }
 
-  return NextResponse.next(); // Allow request to continue
+  return NextResponse.next();
 }
 
-// Apply middleware to protected routes
 export const config = {
-  matcher: ["/dashboard/:path*"], // Protects all /dashboard routes
+  matcher: ["/chat-room/:path*", "/dashboard/:path*"],
 };

@@ -1,25 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 
-const JWT_SECRET = process.env.JWT_SECRET || "mysecretkey123"; // More descriptive
-
-export function generateToken(payload: object): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: "15m" });
-}
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) throw new Error("JWT_SECRET not configured");
 
 export function verifyToken(req: NextRequest) {
-  const authHeader = req.headers.get("Authorization");
-  const token = authHeader?.split(" ")[1];
-
-  if (!token) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const token = req.cookies.get("token")?.value;
+    if (!token) throw new Error("No token");
+
+    const decoded = jwt.verify(token, JWT_SECRET as string);
     return decoded;
+    
   } catch (error) {
-    console.log(error, "Invalid token");
-    return NextResponse.json({ error: "Invalid token" }, { status: 403 });
+    console.error("[AUTH] Token verification failed:", error);
+    const url = req.nextUrl.clone();
+    url.pathname = "/login";
+    return NextResponse.redirect(url);
   }
 }
