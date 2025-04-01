@@ -12,7 +12,7 @@ if (!JWT_SECRET) throw new Error("JWT_SECRET is not defined");
 export async function loginUser(formData: FormData) {
   try {
     console.log("[LOGIN] Starting login process");
-    
+
     if (!process.env.JWT_SECRET) {
       throw new Error("JWT_SECRET is undefined in environment variables");
     }
@@ -28,7 +28,7 @@ export async function loginUser(formData: FormData) {
 
     console.log("[LOGIN] Searching user in database");
     const user = await prisma.user.findUnique({ where: { email } });
-    
+
     if (!user) {
       console.log("[LOGIN] No user found for email:", email);
       return { error: "Invalid credentials" };
@@ -36,7 +36,7 @@ export async function loginUser(formData: FormData) {
 
     console.log("[LOGIN] Comparing passwords");
     const passwordMatch = await bcrypt.compare(password, user.password);
-    
+
     if (!passwordMatch) {
       console.log("[LOGIN] Password mismatch for user:", user.id);
       return { error: "Invalid credentials" };
@@ -50,25 +50,26 @@ export async function loginUser(formData: FormData) {
     );
 
     console.log("[LOGIN] Setting cookie");
-    // In login.ts
-    cookies().set("token", token, {
+    // Await the cookies() Promise to get the cookieStore
+    const cookieStore = await cookies();
+    cookieStore.set("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 60 * 15,
+      maxAge: 60 * 15, // 15 minutes
       path: "/",
-      domain: "localhost" // Add for local development
+      domain: process.env.NODE_ENV === "production" ? ".yourdomain.com" : "localhost", // Adjust domain for production
     });
 
     console.log("[LOGIN] Redirecting to /chat-room");
-    return redirect("/chat-room");
+    redirect("/chat-room");
   } catch (error) {
     console.error("[LOGIN ERROR]", error);
-  
+
     if (error instanceof Error && error.message.includes("NEXT_REDIRECT")) {
       throw error; // Allow Next.js to handle redirects
     }
-  
+
     return { error: "Invalid credentials" }; // Generic message
   }
 }
