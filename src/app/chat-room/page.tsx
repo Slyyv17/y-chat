@@ -1,7 +1,11 @@
+import Sidebar from "@/components/sidebar"
+import Messages from "@/components/messages"
+
 export default function Chat() {
     return (
-        <main>
-            <h1 className="font-bold text-center"> Hello, user!</h1>
+        <main className="w-full h-screen flex items-start justify-center">
+            <Sidebar />
+            <Messages />
         </main>
     )
 }
