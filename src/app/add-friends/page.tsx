@@ -49,14 +49,14 @@ export default function FriendPage() {
 
     return (
         <main className="w-full h-screen flex flex-col gap-4 p-6">
-            <h1 className="text-xl font-semibold">Registered Users</h1>
+            <h1 className="text-xl font-semibold font-body">Registered Users</h1>
 
             {/* Display error message */}
             {errorMessage && (
-                <div className="text-red-500 font-semibold">{errorMessage}</div>
+                <div className="text-red-500 font-semibold font-display">{errorMessage}</div>
             )}
 
-            <div className="space-y-4">
+            <div className="space-y-4 font-display">
                 {/* Render each user */}
                 {users.map((user) => (
                     <div key={user.id} className="p-4 bg-white rounded-lg shadow-md flex justify-between items-center">
@@ -66,7 +66,7 @@ export default function FriendPage() {
                         )}
 
                         <button
-                            className="mt-2 p-2 bg-[var(--color-bg)] text-[var(--color-primary)] rounded-lg"
+                            className="mt-2 p-2 bg-[var(--color-bg)] text-[var(--color-primary)] rounded-lg cursor-pointer"
                             onClick={() => handleAddFriend(user.id)}
                         >
                             Add Friend

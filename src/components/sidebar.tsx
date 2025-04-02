@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { User, UserPlus, Users, Settings } from "lucide-react";
+import { User, UserPlus, Users, Settings, MessageCircle } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 
@@ -10,6 +10,7 @@ export default function Sidebar() {
 
     const links = [
         { href: "/profile", icon: <User size={20} /> },
+        {href: "/messages", icon: <MessageCircle size={20} /> },
         { href: "/add-friends", icon: <UserPlus size={20} /> },
         { href: "/friends", icon: <Users size={20} /> },
         { href: "/settings", icon: <Settings size={20} /> },
