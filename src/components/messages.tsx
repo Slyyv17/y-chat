@@ -8,6 +8,10 @@ export default function Messages() {
             </h1>
             <SearchBar />
             <p className="font-display font-medium text-[var(--color-bg)]"> Sort by: </p>
+
+            <section>
+                
+            </section>
         </main>
     );
 }

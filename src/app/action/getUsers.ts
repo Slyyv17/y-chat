@@ -19,6 +19,10 @@ export async function sendFriendRequest(senderId: string, receiverId: string) {
         const sender = await prisma.user.findUnique({ where: { id: senderId } });
         const receiver = await prisma.user.findUnique({ where: { id: receiverId } });
 
+        if (senderId === receiverId) {
+            throw new Error("Cannot send friend request to yourself");
+        }
+
         if (!sender || !receiver) {
             throw new Error("Sender or receiver does not exist.");
         }
@@ -49,6 +53,6 @@ export async function sendFriendRequest(senderId: string, receiverId: string) {
         return { success: true, message: "Friend request sent!" };
     } catch (error) {
         console.error(error);
-        throw error;
+        throw new Error("Failed to send friend request.");
     }
 }
