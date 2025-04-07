@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getUsers, sendFriendRequest } from "../action/getUsers";
+import { getUsers, sendFriendRequest } from "../../action/getUsers";
 
 export default function AddFriendComponent() {
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
