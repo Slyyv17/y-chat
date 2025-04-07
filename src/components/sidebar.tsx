@@ -37,7 +37,7 @@ export default function Sidebar() {
                         key={href}
                         href={href}
                         className={`flex items-center gap-3 w-full px-4 py-3 rounded-md transition duration-300 
-                        ${pathname === href ? "bg-gray-200 text-[var(--color-primary)] font-semibold" : "text-gray-400 hover:bg-gray-600 hover:text-white"}`}
+                        ${pathname === href ? "bg-gray-500 text-[var(--color-primary)] font-semibold" : "text-gray-400 hover:bg-gray-600 hover:text-white"}`}
                     >
                         {typeof icon === "string" ? (
                             <Image 
