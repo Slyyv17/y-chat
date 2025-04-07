@@ -1,19 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { UserPlus, Users, Settings, MessageCircle } from "lucide-react";
+import { Shield, Users, Settings, MessageCircle, BarChart, Bell, Group } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 
-export default function Sidebar() {
+export default function AdminSidebar(){
     const pathname = usePathname();
 
     const links = [
-        { href: "/profile", icon: "/assets/imgs/default.jpeg", alt: "Profile" },
-        { href: "/messages", icon: <MessageCircle size={20} />, alt: "Messages" },
-        { href: "/add-friends", icon: <UserPlus size={20} />, alt: "Add Friends" },
-        { href: "/friends", icon: <Users size={20} />, alt: "Friends" },
-        { href: "/settings", icon: <Settings size={20} />, alt: "Settings" },
+        { href: "/users", icon: <Users size={20} />, alt: "User Management" },
+        { href: "/chat", icon: <MessageCircle size={20} />, alt: "Chat Management" },
+        { href: "/groups", icon: <Group size={20} />, alt: "Group Management" },
+        { href: "/report", icon: <Shield size={20} />, alt: "Reports" },
+        { href: "/analytics", icon: <BarChart size={20} />, alt: "Analytics" },
+        { href: "/notifications", icon: <Bell size={20} />, alt: "Notification" },
+        { href: "/setting", icon: <Settings size={20} />, alt: "Settings" },
     ];
 
     return (

@@ -1,4 +1,4 @@
-import SocialIcons from "@/app/ui/social-icons";
+import SocialIcons from "@/components/ui/social-icons";
 import Link from "next/link";
 export default function StartUp() {
     return (

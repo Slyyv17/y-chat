@@ -1,4 +1,4 @@
-import SearchBar from "@/app/ui/search";
+import SearchBar from "@/components/ui/search";
 
 export default function Messages() {
     return (
