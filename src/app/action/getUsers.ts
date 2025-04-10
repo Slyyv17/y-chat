@@ -1,58 +1,101 @@
-// ../action/getUsers.ts
+// app/actions/getUsers.ts
 "use server";
 
 import { prisma } from "@/lib/db";
+import { cookies } from "next/headers";
+import jwt from "jsonwebtoken";
 
-export async function getUsers() {
-    try {
-        const users = await prisma.user.findMany();
-        return users;
-    } catch (error) {
-        console.error(error);
-        throw new Error("Failed to fetch users.");
-    }
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) throw new Error("JWT_SECRET is not defined");
+
+// Type for decoded token
+type DecodedToken = {
+  userId: string;
+  email: string;
+  iat: number;
+  exp: number;
+};
+
+// Get token with proper Next.js cookie handling
+function getToken() {
+  try {
+    const cookieStore = cookies();
+    const token = cookieStore.get("token")?.value;
+    return token || null;
+  } catch (error) {
+    console.error("Cookie access error:", error);
+    return null;
+  }
 }
 
-export async function sendFriendRequest(senderId: string, receiverId: string) {
-    try {
-        // Check if sender and receiver exist
-        const sender = await prisma.user.findUnique({ where: { id: senderId } });
-        const receiver = await prisma.user.findUnique({ where: { id: receiverId } });
-
-        if (senderId === receiverId) {
-            throw new Error("Cannot send friend request to yourself");
-        }
-
-        if (!sender || !receiver) {
-            throw new Error("Sender or receiver does not exist.");
-        }
-
-        // Check if a friend request already exists
-        const existingRequest = await prisma.friendRequest.findUnique({
-            where: {
-                senderId_receiverId: {
-                    senderId,
-                    receiverId,
-                },
-            },
-        });
-
-        if (existingRequest) {
-            throw new Error("Friend request already sent!");
-        }
-
-        // Create a new friend request
-        await prisma.friendRequest.create({
-            data: {
-                senderId,
-                receiverId,
-                status: "PENDING",
-            },
-        });
-
-        return { success: true, message: "Friend request sent!" };
-    } catch (error) {
-        console.error(error);
-        throw new Error("Failed to send friend request.");
+// JWT verification with proper secret handling
+function verifyToken(token: string): DecodedToken {
+  try {
+    // Explicit type assertion for secret
+    const secret = JWT_SECRET as string;
+    const decoded = jwt.verify(token, secret) as DecodedToken;
+    
+    if (!decoded.userId) {
+      throw new Error("Invalid token payload");
     }
+    
+    return decoded;
+  } catch (error) {
+    console.error("Token verification failed:", error);
+    throw new Error("Authentication failed");
+  }
+}
+
+export async function getUsers() {
+  try {
+    const token = getToken();
+    if (!token) return [];
+
+    const { userId } = verifyToken(token);
+    
+    const users = await prisma.user.findMany({
+      where: {
+        NOT: { id: userId },
+        receivedRequests: {
+          none: {
+            senderId: userId,
+            status: "PENDING"
+          }
+        }
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        profileImage: true
+      }
+    });
+
+    return users;
+  } catch (error) {
+    console.error("Get users error:", error);
+    return [];
+  }
+}
+
+export async function getCurrentUser() {
+  try {
+    const token = getToken();
+    if (!token) return null;
+
+    const { userId } = verifyToken(token);
+    
+    return await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        profileImage: true
+      }
+    });
+  } catch (error) {
+    console.error("Get current user error:", error);
+    return null;
+  }
 }

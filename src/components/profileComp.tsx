@@ -1,102 +1,116 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
+import { useState } from 'react';
+import { updateUser } from '@/app/action/updateUser'; // Adjust the path as necessary
 
-export default function ProfileComponent() {
-  const [username, setUsername] = useState<string | null>(null);
-  const [image, setImage] = useState<File | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+interface ProfilePageProps {
+  userId: string;
+  currentName: string;
+  currentProfileImage: string; // Add type for currentProfileImage
+}
 
-  // Handle image selection
+const ProfilePage = ({ userId, currentName = '', currentProfileImage }: ProfilePageProps) => {
+  const [name, setName] = useState(currentName);
+  const [profileImage, setProfileImage] = useState<File | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  // Handle image input change
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setImage(e.target.files[0]);
+    const file = e.target.files?.[0];
+    if (file) {
+      setProfileImage(file);
+
+      // Create an object URL to display the image preview
+      const objectUrl = URL.createObjectURL(file);
+      setPreviewImage(objectUrl);
     }
   };
 
-  // Handle form submission (name & image update)
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Handle form submit
+const handleSubmit = async (event: React.FormEvent) => {
+  event.preventDefault();
+  setLoading(true);
 
-    const formData = new FormData();
-    formData.append("name", username || "");
-    if (image) {
-      formData.append("image", image);
-    }
+  const formData = new FormData();
+  formData.append('name', name);
 
-    try {
-      const response = await fetch("/api/updateUser/route.ts", {
-        method: "POST",
-        body: formData,
-      });
+  // Append the profile image if it exists
+  if (profileImage) {
+    formData.append('profileImage', profileImage);
+  }
 
-      if (!response.ok) {
-        throw new Error("Failed to update user");
-      }
+  try {
+    const updatedUser = await updateUser(userId, formData);
+    console.log('User updated:', updatedUser);
+    setLoading(false);
+  } catch (err) {
+    setLoading(false);
+    setError('Failed to update profile. Please try again.');
+    console.error(err);
+  }
+};
 
-      const updatedUser = await response.json();
-      setUsername(updatedUser.name);
-      // Do something else after the update (e.g., success notification)
-    } catch (error) {
-      console.error("Error updating user:", error);
-      setErrorMessage("Failed to update profile.");
-    }
-  };
+  // Default image path (assuming it's in the public folder)
+  const defaultImage = '/assets/imgs/default.jpeg';
+
+  // Determine the image to display
+  const imageToDisplay = previewImage || currentProfileImage || defaultImage;
 
   return (
-    <main className="w-full h-screen flex items-center justify-start gap-4 bg-gray-50 flex-col px-4">
-      <div className="w-full flex items-start justify-start mt-2">
-        <button className="text-[var(--color-bg)] bg-transparent p-2">
-          <Link href="/chat-room">
-            <ArrowLeft size={24} />
-          </Link>
-        </button>
-      </div>
-
-      {/* Profile Title Section */}
-      <div className="w-full flex items-start justify-center mb-6">
-        <h1 className="text-3xl font-semibold text-gray-800 font-body">Profile</h1>
-      </div>
-
-      {/* Profile Image Upload Section */}
-      <section className="flex flex-col items-center mb-6 justify-center w-auto">
-        <div className="w-32 h-32 bg-gray-200 rounded-full overflow-hidden shadow-lg mb-4">
+    <div className="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-lg">
+      <h1 className="text-2xl font-semibold text-center mb-6">Update Profile</h1>
+      <form onSubmit={handleSubmit}>
+        {/* Display image preview or default image */}
+        <div className="mb-4 text-center">
           <img
-            src={image ? URL.createObjectURL(image) : "/assets/imgs/default.jpeg"}
-            alt="Profile Image"
-            className="w-full h-full object-cover"
+            src={imageToDisplay}
+            alt="Selected Profile"
+            className="w-32 h-32 object-cover rounded-full mx-auto"
           />
         </div>
-        <input type="file" onChange={handleImageChange} placeholder="choose a pic" />
-      </section>
 
-      {/* Name Edit Section */}
-      <section className="flex flex-col items-center gap-2">
-        <input
-          type="text"
-          value={username || ""}
-          onChange={(e) => setUsername(e.target.value)}
-          className="border p-2 rounded"
-        />
-        <span className="text-lg text-gray-700 font-display">Edit Name</span>
-      </section>
-
-      {/* Submit Button */}
-      <button
-        onClick={handleSubmit}
-        className="bg-[var(--color-bg)] text-[var(--color-primary)] font-semibold text-lg py-2 px-4 rounded-md font-display mt-4"
-      >
-        Update Profile
-      </button>
-
-      {/* Error Message Section */}
-      {errorMessage && (
-        <div className="mt-4 text-red-500">
-          <p>{errorMessage}</p>
+        {/* Name input */}
+        <div className="mb-4">
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
+          <input
+            type="text"
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            placeholder="Enter new name"
+            required
+          />
         </div>
-      )}
-    </main>
+
+        {/* Profile Image upload */}
+        <div className="mb-6">
+          <label htmlFor="profileImage" className="block text-sm font-medium text-gray-700">Profile Image</label>
+          <input
+            type="file"
+            id="profileImage"
+            onChange={handleImageChange}
+            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+
+        {/* Submit button */}
+        <div className="text-center">
+          <button
+            type="submit"
+            className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700"
+            disabled={loading}
+          >
+            {loading ? 'Updating...' : 'Update Profile'}
+          </button>
+        </div>
+
+        {error && <p className="text-red-500 text-center mt-4">{error}</p>}
+      </form>
+    </div>
   );
-}
+};
+
+export default ProfilePage;
