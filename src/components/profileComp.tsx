@@ -27,7 +27,7 @@ export default function ProfileComponent() {
     }
 
     try {
-      const response = await fetch("/api/updateUser", {
+      const response = await fetch("/api/updateUser/route.ts", {
         method: "POST",
         body: formData,
       });
@@ -61,7 +61,7 @@ export default function ProfileComponent() {
       </div>
 
       {/* Profile Image Upload Section */}
-      <section className="flex flex-col items-center mb-6 justify-center">
+      <section className="flex flex-col items-center mb-6 justify-center w-auto">
         <div className="w-32 h-32 bg-gray-200 rounded-full overflow-hidden shadow-lg mb-4">
           <img
             src={image ? URL.createObjectURL(image) : "/assets/imgs/default.jpeg"}
@@ -69,7 +69,7 @@ export default function ProfileComponent() {
             className="w-full h-full object-cover"
           />
         </div>
-        <input type="file" onChange={handleImageChange} />
+        <input type="file" onChange={handleImageChange} placeholder="choose a pic" />
       </section>
 
       {/* Name Edit Section */}
