@@ -1,9 +1,9 @@
 // app/utils/authUtils.ts
-import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
+import { cookies } from "next/headers";
 
 const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET) throw new Error("JWT_SECRET not configured");
+if (!JWT_SECRET) throw new Error("JWT_SECRET is not defined");
 
 export type DecodedToken = {
   userId: string;
@@ -12,11 +12,25 @@ export type DecodedToken = {
   exp?: number;
 };
 
-export function verifyToken(): DecodedToken {
+// Function to retrieve the token from cookies
+export async function getToken(): Promise<string | null> {
   try {
     const cookieStore = cookies();
     const token = cookieStore.get("token")?.value;
-    if (!token) throw new Error("Not authenticated");
+    return token || null;
+  } catch (error) {
+    console.error("Cookie access error:", error);
+    return null;
+  }
+}
+
+// Function to verify the token and decode its payload
+export async function verifyToken(): Promise<DecodedToken> {
+  try {
+    const token = await getToken(); // Use the getToken function defined above
+    if (!token) {
+      throw new Error("Not authenticated");
+    }
 
     const decoded = jwt.verify(token, JWT_SECRET as string);
     if (typeof decoded === "string" || !decoded.userId) {
@@ -25,7 +39,7 @@ export function verifyToken(): DecodedToken {
 
     return decoded as unknown as DecodedToken;
   } catch (error) {
-    console.error("[AUTH] Token verification failed:", error);
+    console.error("Token verification failed:", error);
     throw new Error("Invalid or expired token");
   }
 }

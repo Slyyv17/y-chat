@@ -7,19 +7,13 @@ import { RequestStatus } from "@prisma/client";
 
 export async function sendFriendRequest(receiverId: string) {
   try {
-    const { userId: senderId } = verifyToken();
+    const { userId: senderId } = await verifyToken();
 
     // Validation checks
-    if (senderId === receiverId) throw new Error("Cannot send friend request to yourself.");
+    if (senderId === receiverId) {
+      throw new Error("Cannot send friend request to yourself");
+    }
 
-    // Check if users exist
-    const [sender, receiver] = await Promise.all([
-      prisma.user.findUnique({ where: { id: senderId } }),
-      prisma.user.findUnique({ where: { id: receiverId } }),
-    ]);
-    if (!sender || !receiver) throw new Error("User not found.");
-
-    // Check for existing requests
     const [existingRequest, reverseRequest] = await Promise.all([
       prisma.friendRequest.findUnique({
         where: { senderId_receiverId: { senderId, receiverId } },
@@ -30,9 +24,8 @@ export async function sendFriendRequest(receiverId: string) {
     ]);
 
     if (existingRequest) throw new Error("Friend request already sent.");
-    if (reverseRequest) throw new Error("This user has already sent you a friend request.");
+    if (reverseRequest) throw new Error("This user already sent you a friend request.");
 
-    // Create new request
     await prisma.friendRequest.create({
       data: { senderId, receiverId, status: RequestStatus.PENDING },
     });
