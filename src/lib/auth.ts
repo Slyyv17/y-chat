@@ -1,21 +1,31 @@
-import { NextRequest, NextResponse } from "next/server";
+// app/utils/authUtils.ts
+import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) throw new Error("JWT_SECRET not configured");
 
-export function verifyToken(req: NextRequest) {
+export type DecodedToken = {
+  userId: string;
+  email: string;
+  iat?: number;
+  exp?: number;
+};
+
+export function verifyToken(): DecodedToken {
   try {
-    const token = req.cookies.get("token")?.value;
-    if (!token) throw new Error("No token");
+    const cookieStore = cookies();
+    const token = cookieStore.get("token")?.value;
+    if (!token) throw new Error("Not authenticated");
 
     const decoded = jwt.verify(token, JWT_SECRET as string);
-    return decoded;
-    
+    if (typeof decoded === "string" || !decoded.userId) {
+      throw new Error("Invalid token structure");
+    }
+
+    return decoded as unknown as DecodedToken;
   } catch (error) {
     console.error("[AUTH] Token verification failed:", error);
-    const url = req.nextUrl.clone();
-    url.pathname = "/login";
-    return NextResponse.redirect(url);
+    throw new Error("Invalid or expired token");
   }
 }

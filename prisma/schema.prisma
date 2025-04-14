@@ -18,7 +18,7 @@ model User {
   // Friend Relationships
   friendships1 Friends[]      @relation("Friends1")
   friendships2 Friends[]      @relation("Friends2")
-  
+
   // Friend Requests
   sentRequests   FriendRequest[] @relation("SentRequests")
   receivedRequests FriendRequest[] @relation("ReceivedRequests")

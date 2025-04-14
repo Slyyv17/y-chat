@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { UserPlus, Users, Settings, MessageCircle, LogOut } from "lucide-react";
+import { UserPlus, Users, Clock, Settings, MessageCircle, LogOut } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -21,6 +21,7 @@ export default function Sidebar() {
         { href: "/profile", icon: "/assets/imgs/default.jpeg", alt: "Profile" },
         { href: "/messages", icon: <MessageCircle size={22} />, alt: "Messages" },
         { href: "/add-friends", icon: <UserPlus size={22} />, alt: "Add Friends" },
+        { href: "/pending-requests", icon: <Clock size={22} />, alt: "Pending Request" },
         { href: "/friends", icon: <Users size={22} />, alt: "Friends" },
         { href: "/settings", icon: <Settings size={22} />, alt: "Settings" },
     ];
